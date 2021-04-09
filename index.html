@@ -85,34 +85,48 @@ var request = new XMLHttpRequest()
 
 request.open('GET', 'http://www.db.chgk.info/questions?page=' + random_question + '&itemsPerPage=1', true)
 request.onload = function () {
-  // Begin accessing JSON data here
+
+  processText = function(text){
+
+    //replace new lines with BR tags
+    text = text.replaceAll(/\n/g, "<br />");
+
+    //replace (pic: xxxxxxx.jpg) with image tags
+    let regEx = /\(pic: (\S+)\)/gm;
+    text = text.replaceAll(regEx,function(string,filename){
+      return '<img src="https://db.chgk.info/images/db/'+filename+'">';
+    });
+
+    return text;
+  };
+
+    // Begin accessing JSON data here
   var data = JSON.parse(this.response)
 
   if (request.status >= 200 && request.status < 400) {
-      /*console.log(data);
+    /*console.log(data);
       console.log(data["hydra:member"][0]["question"]);
       console.log(data["hydra:member"][0]["authors"]);
       console.log(data["hydra:member"][0]["answer"]);*/
       /*    data.forEach((question) => {
       console.log(question)
     })*/
-    
-    document.getElementById("status").innerHTML = 'Вопрос готов!';  
-    document.getElementById("author").innerHTML = data["hydra:member"][0]["authors"];
-    document.getElementById("question").innerHTML = data["hydra:member"][0]["question"];
-    document.getElementById("answer").innerHTML = data["hydra:member"][0]["answer"];
-    document.getElementById("comments").innerHTML = data["hydra:member"][0]["comments"];
-      
+
+    document.getElementById("status").innerHTML = 'Вопрос готов!';
+    document.getElementById("author").innerHTML = processText(data["hydra:member"][0]["authors"]);
+    document.getElementById("question").innerHTML = processText(data["hydra:member"][0]["question"]);
+    document.getElementById("answer").innerHTML = processText(data["hydra:member"][0]["answer"]);
+    document.getElementById("comments").innerHTML = processText(data["hydra:member"][0]["comments"]);
+
     /*Поменять стиль кнопки*/
-      document.getElementById("submit_button").classList.add('btn-success');
-      document.getElementById("submit_button").classList.remove('btn-dark');
+    document.getElementById("submit_button").classList.add('btn-success');
+    document.getElementById("submit_button").classList.remove('btn-dark');
 
 
   } else {
     console.log('error')
   }
 }
-
 request.send()
 }
                 
